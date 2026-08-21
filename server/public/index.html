@@ -123,6 +123,7 @@
     margin-bottom: 0.9rem;
   }
   .card h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+  .card mark { background: color-mix(in srgb, var(--accent) 35%, transparent); color: inherit; border-radius: 3px; }
   .card > p { margin: 0 0 0.7rem; color: var(--muted); font-size: 0.9rem; white-space: pre-wrap; }
   .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
   .actions a {
@@ -148,10 +149,15 @@
 
   <section id="tab-install" class="tab-panel active">
     <h2>Claude Code</h2>
-    <p class="hint">Thêm (scope <code>user</code> = global, mọi project đều thấy):</p>
+    <p class="hint">Thêm — scope <code>user</code>: global, mọi project đều thấy (khuyến nghị):</p>
     <div class="code-block">
-      <pre id="cmd-claude-add"></pre>
-      <button class="copy" data-target="cmd-claude-add">Copy</button>
+      <pre id="cmd-claude-add-user"></pre>
+      <button class="copy" data-target="cmd-claude-add-user">Copy</button>
+    </div>
+    <p class="hint">Thêm — scope <code>local</code> (mặc định nếu không truyền <code>-s</code>): chỉ project hiện tại:</p>
+    <div class="code-block">
+      <pre id="cmd-claude-add-local"></pre>
+      <button class="copy" data-target="cmd-claude-add-local">Copy</button>
     </div>
     <p class="hint">Xoá:</p>
     <div class="code-block">
@@ -161,9 +167,11 @@
 
     <h2>OpenCode</h2>
     <p class="hint">
-      Thêm: OpenCode không có cờ scope như Claude Code — ghi vào file config tuỳ nơi bạn
-      chạy lệnh (trong 1 project → chỉ project đó thấy; ngoài mọi project, vd ở
-      <code>~</code> → global, mọi project thấy):
+      Thêm: OpenCode không có cờ scope như Claude Code. Câu lệnh dưới (đủ <code>--url</code>)
+      chạy non-interactive nên luôn ghi vào global
+      <code>~/.config/opencode/opencode.json</code>, dù bạn đang ở project nào. Chỉ khi gõ
+      <code>opencode mcp add</code> không kèm cờ (wizard hỏi từng bước) và đang trong git
+      repo thì nó mới hỏi Current project / Global:
     </p>
     <div class="code-block">
       <pre id="cmd-opencode-add"></pre>
@@ -174,6 +182,23 @@
       <code>~/.config/opencode/opencode.json</code> (global) hoặc
       <code>opencode.json</code> ở root project, xoá thủ công entry
       <code>"skill-registry"</code> trong mục <code>mcp</code>.
+    </p>
+
+    <h2>Verify</h2>
+    <p class="hint">Sau khi add, kiểm tra đã connect chưa:</p>
+    <div class="code-block">
+      <pre id="cmd-verify-claude"></pre>
+      <button class="copy" data-target="cmd-verify-claude">Copy</button>
+    </div>
+    <p class="hint">
+      Kỳ vọng: <code id="expect-claude"></code>
+    </p>
+    <div class="code-block">
+      <pre id="cmd-verify-opencode"></pre>
+      <button class="copy" data-target="cmd-verify-opencode">Copy</button>
+    </div>
+    <p class="hint">
+      Kỳ vọng: <code>●  ✓ skill-registry connected</code>
     </p>
   </section>
 
@@ -187,12 +212,20 @@ const GITHUB_REPO = 'trisforrestcam/CamkSkillV2';
 const GITHUB_BRANCH = 'main';
 
 const originUrl = location.origin;
-document.getElementById('cmd-claude-add').textContent =
+document.getElementById('cmd-claude-add-user').textContent =
   `claude mcp add --transport http skill-registry ${originUrl}/mcp -s user`;
+document.getElementById('cmd-claude-add-local').textContent =
+  `claude mcp add --transport http skill-registry ${originUrl}/mcp -s local`;
 document.getElementById('cmd-claude-remove').textContent =
   `claude mcp remove skill-registry`;
 document.getElementById('cmd-opencode-add').textContent =
   `opencode mcp add skill-registry --url ${originUrl}/mcp`;
+document.getElementById('cmd-verify-claude').textContent =
+  `claude mcp list | grep skill-registry`;
+document.getElementById('cmd-verify-opencode').textContent =
+  `opencode mcp list | grep skill-registry`;
+document.getElementById('expect-claude').textContent =
+  `skill-registry: ${originUrl}/mcp (HTTP) - ✔ Connected`;
 
 document.querySelectorAll('nav.tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -225,11 +258,19 @@ function escapeHtml(s) {
 
 let allSkills = [];
 
-function renderSkills(skills) {
+function highlight(text, q) {
+  const escaped = escapeHtml(text);
+  if (!q) return escaped;
+  const idx = escaped.toLowerCase().indexOf(escapeHtml(q).toLowerCase());
+  if (idx === -1) return escaped;
+  return escaped.slice(0, idx) + '<mark>' + escaped.slice(idx, idx + q.length) + '</mark>' + escaped.slice(idx + q.length);
+}
+
+function renderSkills(skills, q = '') {
   const list = document.getElementById('skills-list');
   list.innerHTML = skills.length ? skills.map(s => `
     <article class="card">
-      <h3>${escapeHtml(s.name)}</h3>
+      <h3>${highlight(s.name, q)}</h3>
       <p>${escapeHtml(s.description)}</p>
       <div class="actions">
         <a href="https://github.com/${GITHUB_REPO}/tree/${GITHUB_BRANCH}/${encodeURIComponent(s.dir)}" target="_blank" rel="noopener">Xem trên GitHub</a>
@@ -245,11 +286,11 @@ async function loadSkills() {
 }
 
 document.getElementById('search').addEventListener('input', (e) => {
-  const q = e.target.value.trim().toLowerCase();
-  const filtered = q
-    ? allSkills.filter(s => s.name.toLowerCase().includes(q) || s.description.toLowerCase().includes(q))
-    : allSkills;
-  renderSkills(filtered);
+  const q = e.target.value.trim();
+  const ql = q.toLowerCase();
+  if (!ql) return renderSkills(allSkills);
+  const filtered = allSkills.filter(s => s.name.toLowerCase().includes(ql));
+  renderSkills(filtered, q);
 });
 
 loadSkills();

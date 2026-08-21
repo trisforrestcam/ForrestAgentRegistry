@@ -44,19 +44,29 @@ Thay `https://<domain>` bằng domain thật của VPS.
 
 **Claude Code:**
 ```bash
-claude mcp add --transport http skill-registry https://<domain>/mcp -s user   # thêm (scope user = global cho mọi project)
-claude mcp remove skill-registry                                      # xoá
+claude mcp add --transport http skill-registry https://<domain>/mcp -s user    # thêm, global (mọi project) — khuyến nghị
+claude mcp add --transport http skill-registry https://<domain>/mcp -s local   # thêm, chỉ project hiện tại (mặc định nếu bỏ -s)
+claude mcp remove skill-registry                                               # xoá
 ```
 
 **OpenCode:**
 ```bash
 opencode mcp add skill-registry --url https://<domain>/mcp   # thêm
 ```
-OpenCode không có cờ scope như Claude Code (`-s user`/`-s local`) — nó ghi trực tiếp vào
-file config tuỳ nơi bạn đang chạy lệnh: chạy trong 1 project sẽ ghi vào `opencode.json` ở
-root project đó (chỉ project này thấy), chạy ngoài mọi project (vd ở `~`) sẽ ghi vào
-`~/.config/opencode/opencode.json` (global, mọi project thấy). Muốn global thì `cd` ra khỏi
-project trước khi chạy lệnh trên.
+OpenCode không có cờ scope như Claude Code. Câu lệnh trên (đủ `--url`) chạy hoàn toàn
+non-interactive nên **luôn ghi vào global** `~/.config/opencode/opencode.json`, bất kể bạn
+đang ở project nào — đã kiểm chứng thực tế, chạy trong hay ngoài git repo đều ra global.
+Chỉ khi gõ `opencode mcp add` **không kèm cờ nào** (wizard hỏi từng bước) và đang ở trong 1
+git repo, nó mới hỏi bạn chọn Current project hay Global.
+
+**Verify sau khi add (chạy được ở bất kỳ project nào nếu add global):**
+```bash
+claude mcp list | grep skill-registry
+# kỳ vọng: skill-registry: https://<domain>/mcp (HTTP) - ✔ Connected
+
+opencode mcp list | grep skill-registry
+# kỳ vọng: ●  ✓ skill-registry connected
+```
 
 OpenCode CLI chưa có lệnh xoá — gỡ thủ công bằng cách mở
 `~/.config/opencode/opencode.json` (global) hoặc `opencode.json` ở root project, xoá entry
