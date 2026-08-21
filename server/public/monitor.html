@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Skill Registry — Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <h1>Skill Registry</h1>
+  <p class="subtitle">Skills dùng chung, host trên 1 server — add vào Claude Code/OpenCode bằng 1 lệnh.</p>
+
+  <nav class="tabs">
+    <a href="/index.html">Cài đặt</a>
+    <a href="/skills.html">Skills</a>
+    <a href="/monitor.html" class="active">Monitor</a>
+  </nav>
+
+  <section>
+    <h2>Cài đặt hook/plugin thu thập log</h2>
+    <p class="hint">
+      Claude Code sẽ gọi webhook khi session kết thúc (<code>SessionEnd</code>); OpenCode gọi khi
+      session idle. Dữ liệu (tool/skill đã dùng trong session) được gửi về server này để sau tối ưu skill.
+    </p>
+    <div class="code-block">
+      <pre id="cmd-install"></pre>
+      <button class="copy" data-target="cmd-install">Copy</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Events gần đây</h2>
+    <div id="events-list">Đang tải...</div>
+  </section>
+
+<script src="/monitor.js"></script>
+<script src="/copy.js"></script>
+</body>
+</html>

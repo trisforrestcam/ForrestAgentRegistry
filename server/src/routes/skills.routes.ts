@@ -1,17 +1,18 @@
 import { Router } from "express";
 import archiver from "archiver";
-import { getSkill, getSkillMarkdown, loadSkills, readSkillFile, skillDirPath } from "./registry.js";
+import { getSkill, getSkillMarkdown, loadSkills, readSkillFile, skillDirPath } from "../services/registry.service.js";
 
-export const restRouter = Router();
+export const skillsRouter = Router();
 
-restRouter.get("/skills", async (_req, res) => {
+// Mounted at /api/skills — paths below are relative to that.
+skillsRouter.get("/", async (_req, res) => {
   const skills = await loadSkills();
   res.json({
     skills: skills.map(({ name, description, dir }) => ({ name, description, dir })),
   });
 });
 
-restRouter.get("/skills/:name", async (req, res) => {
+skillsRouter.get("/:name", async (req, res) => {
   const skill = await getSkill(req.params.name);
   if (!skill) {
     res.status(404).json({ error: "skill not found" });
@@ -21,7 +22,7 @@ restRouter.get("/skills/:name", async (req, res) => {
   res.json({ ...skill, markdown });
 });
 
-restRouter.get("/skills/:name/files/*", async (req, res) => {
+skillsRouter.get("/:name/files/*", async (req, res) => {
   const relPath = (req.params as Record<string, string>)[0];
   try {
     const content = await readSkillFile(req.params.name, relPath);
@@ -35,7 +36,7 @@ restRouter.get("/skills/:name/files/*", async (req, res) => {
   }
 });
 
-restRouter.get("/skills/:name/download", async (req, res) => {
+skillsRouter.get("/:name/download", async (req, res) => {
   const skill = await getSkill(req.params.name);
   if (!skill) {
     res.status(404).json({ error: "skill not found" });

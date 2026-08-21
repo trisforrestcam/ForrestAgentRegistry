@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { env } from "../config/env.js";
 
 export interface SkillMeta {
   name: string;
@@ -27,9 +28,9 @@ function parseFrontmatter(raw: string): Record<string, string> {
 
 // Skills now live in a separate repo (CamkSkillV2), checked out wherever SKILLS_PATH
 // points on this machine. Falls back to a sibling ../skills for local dev convenience.
-const SKILLS_ROOT = process.env.SKILLS_PATH
-  ? path.resolve(process.env.SKILLS_PATH)
-  : path.resolve(import.meta.dirname, "../../skills");
+const SKILLS_ROOT = env.skillsPath
+  ? path.resolve(env.skillsPath)
+  : path.resolve(import.meta.dirname, "../../../skills");
 
 async function listFilesRecursive(dir: string, base = dir): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
