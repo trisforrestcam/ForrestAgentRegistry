@@ -4,150 +4,18 @@
 <meta charset="utf-8">
 <title>Skill Registry</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  :root {
-    color-scheme: light dark;
-    --bg: #ffffff;
-    --fg: #1a1a1a;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --card-bg: #f9fafb;
-    --code-bg: #0f172a;
-    --code-fg: #e2e8f0;
-    --accent: #4f46e5;
-    --accent-fg: #ffffff;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0b0d12;
-      --fg: #e5e7eb;
-      --muted: #9ca3af;
-      --border: #262b36;
-      --card-bg: #131722;
-      --code-bg: #05070b;
-      --code-fg: #d1d5db;
-      --accent: #818cf8;
-      --accent-fg: #0b0d12;
-    }
-  }
-  * { box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 2.5rem 1.25rem 4rem;
-    line-height: 1.55;
-    background: var(--bg);
-    color: var(--fg);
-  }
-  h1 { margin: 0 0 0.2rem; font-size: 1.6rem; }
-  .subtitle { color: var(--muted); margin: 0 0 2rem; }
-
-  nav.tabs {
-    display: flex;
-    gap: 0.25rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1.75rem;
-  }
-  nav.tabs button {
-    background: none;
-    border: none;
-    padding: 0.6rem 1.1rem;
-    font-size: 0.95rem;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-  }
-  nav.tabs button.active {
-    color: var(--fg);
-    border-bottom-color: var(--accent);
-    font-weight: 600;
-  }
-
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-
-  h2 { font-size: 1.05rem; margin: 1.75rem 0 0.6rem; }
-  h2:first-child { margin-top: 0; }
-  p.hint { color: var(--muted); font-size: 0.9rem; margin: -0.3rem 0 0.6rem; }
-
-  .code-block { position: relative; margin-bottom: 1.25rem; }
-  .code-block pre {
-    background: var(--code-bg);
-    color: var(--code-fg);
-    padding: 0.85rem 1rem;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-size: 0.85rem;
-    margin: 0;
-  }
-  .code-block button.copy {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.6rem;
-    border-radius: 6px;
-    border: 1px solid #ffffff33;
-    background: #ffffff14;
-    color: var(--code-fg);
-    cursor: pointer;
-  }
-
-  code {
-    font-family: ui-monospace, monospace;
-    font-size: 0.85em;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0.1em 0.35em;
-  }
-
-  input#search {
-    width: 100%;
-    padding: 0.55rem 0.8rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    color: var(--fg);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-  }
-
-  .card {
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 1rem 1.1rem;
-    margin-bottom: 0.9rem;
-  }
-  .card h3 { margin: 0 0 0.35rem; font-size: 1rem; }
-  .card mark { background: color-mix(in srgb, var(--accent) 35%, transparent); color: inherit; border-radius: 3px; }
-  .card > p { margin: 0 0 0.7rem; color: var(--muted); font-size: 0.9rem; white-space: pre-wrap; }
-  .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-  .actions a {
-    font-size: 0.82rem;
-    padding: 0.35rem 0.7rem;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--fg);
-    text-decoration: none;
-  }
-  .actions a:hover { border-color: var(--accent); }
-</style>
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <h1>Skill Registry</h1>
   <p class="subtitle">Skills dùng chung, host trên 1 server — add vào Claude Code/OpenCode bằng 1 lệnh.</p>
 
   <nav class="tabs">
-    <button data-tab="install" class="active">Cài đặt</button>
-    <button data-tab="skills">Skills</button>
+    <a href="/index.html" class="active">Cài đặt</a>
+    <a href="/skills.html">Skills</a>
   </nav>
 
-  <section id="tab-install" class="tab-panel active">
+  <section>
     <h2>Claude Code</h2>
     <p class="hint">Thêm — scope <code>user</code>: global, mọi project đều thấy (khuyến nghị):</p>
     <div class="code-block">
@@ -202,98 +70,7 @@
     </p>
   </section>
 
-  <section id="tab-skills" class="tab-panel">
-    <input type="text" id="search" placeholder="Tìm skill theo tên hoặc mô tả...">
-    <div id="skills-list">Đang tải...</div>
-  </section>
-
-<script>
-const GITHUB_REPO = 'trisforrestcam/CamkSkillV2';
-const GITHUB_BRANCH = 'main';
-
-const originUrl = location.origin;
-document.getElementById('cmd-claude-add-user').textContent =
-  `claude mcp add --transport http skill-registry ${originUrl}/mcp -s user`;
-document.getElementById('cmd-claude-add-local').textContent =
-  `claude mcp add --transport http skill-registry ${originUrl}/mcp -s local`;
-document.getElementById('cmd-claude-remove').textContent =
-  `claude mcp remove skill-registry`;
-document.getElementById('cmd-opencode-add').textContent =
-  `opencode mcp add skill-registry --url ${originUrl}/mcp`;
-document.getElementById('cmd-verify-claude').textContent =
-  `claude mcp list | grep skill-registry`;
-document.getElementById('cmd-verify-opencode').textContent =
-  `opencode mcp list | grep skill-registry`;
-document.getElementById('expect-claude').textContent =
-  `skill-registry: ${originUrl}/mcp (HTTP) - ✔ Connected`;
-
-document.querySelectorAll('nav.tabs button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-  });
-});
-
-document.querySelectorAll('button.copy').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const text = document.getElementById(btn.dataset.target).textContent;
-    await navigator.clipboard.writeText(text);
-    const original = btn.textContent;
-    btn.textContent = 'Đã copy';
-    setTimeout(() => { btn.textContent = original; }, 1200);
-  });
-});
-
-async function api(path) {
-  const res = await fetch('/api' + path);
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || res.statusText);
-  return res.json();
-}
-
-function escapeHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-let allSkills = [];
-
-function highlight(text, q) {
-  const escaped = escapeHtml(text);
-  if (!q) return escaped;
-  const idx = escaped.toLowerCase().indexOf(escapeHtml(q).toLowerCase());
-  if (idx === -1) return escaped;
-  return escaped.slice(0, idx) + '<mark>' + escaped.slice(idx, idx + q.length) + '</mark>' + escaped.slice(idx + q.length);
-}
-
-function renderSkills(skills, q = '') {
-  const list = document.getElementById('skills-list');
-  list.innerHTML = skills.length ? skills.map(s => `
-    <article class="card">
-      <h3>${highlight(s.name, q)}</h3>
-      <p>${escapeHtml(s.description)}</p>
-      <div class="actions">
-        <a href="https://github.com/${GITHUB_REPO}/tree/${GITHUB_BRANCH}/${encodeURIComponent(s.dir)}" target="_blank" rel="noopener">Xem trên GitHub</a>
-        <a href="/api/skills/${encodeURIComponent(s.dir)}/download">Download .zip</a>
-      </div>
-    </article>`).join('') : '<p class="hint">Không tìm thấy skill nào.</p>';
-}
-
-async function loadSkills() {
-  const { skills } = await api('/skills');
-  allSkills = skills;
-  renderSkills(skills);
-}
-
-document.getElementById('search').addEventListener('input', (e) => {
-  const q = e.target.value.trim();
-  const ql = q.toLowerCase();
-  if (!ql) return renderSkills(allSkills);
-  const filtered = allSkills.filter(s => s.name.toLowerCase().includes(ql));
-  renderSkills(filtered, q);
-});
-
-loadSkills();
-</script>
+<script src="/install.js"></script>
+<script src="/copy.js"></script>
 </body>
 </html>
