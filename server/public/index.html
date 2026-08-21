@@ -148,7 +148,7 @@
 
   <section id="tab-install" class="tab-panel active">
     <h2>Claude Code</h2>
-    <p class="hint">Thêm:</p>
+    <p class="hint">Thêm (scope <code>user</code> = global, mọi project đều thấy):</p>
     <div class="code-block">
       <pre id="cmd-claude-add"></pre>
       <button class="copy" data-target="cmd-claude-add">Copy</button>
@@ -160,7 +160,11 @@
     </div>
 
     <h2>OpenCode</h2>
-    <p class="hint">Thêm:</p>
+    <p class="hint">
+      Thêm: OpenCode không có cờ scope như Claude Code — ghi vào file config tuỳ nơi bạn
+      chạy lệnh (trong 1 project → chỉ project đó thấy; ngoài mọi project, vd ở
+      <code>~</code> → global, mọi project thấy):
+    </p>
     <div class="code-block">
       <pre id="cmd-opencode-add"></pre>
       <button class="copy" data-target="cmd-opencode-add">Copy</button>
@@ -184,7 +188,7 @@ const GITHUB_BRANCH = 'main';
 
 const originUrl = location.origin;
 document.getElementById('cmd-claude-add').textContent =
-  `claude mcp add --transport http skill-registry ${originUrl}/mcp`;
+  `claude mcp add --transport http skill-registry ${originUrl}/mcp -s user`;
 document.getElementById('cmd-claude-remove').textContent =
   `claude mcp remove skill-registry`;
 document.getElementById('cmd-opencode-add').textContent =

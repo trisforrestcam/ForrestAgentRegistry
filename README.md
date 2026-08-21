@@ -44,7 +44,7 @@ Thay `https://<domain>` bằng domain thật của VPS.
 
 **Claude Code:**
 ```bash
-claude mcp add --transport http skill-registry https://<domain>/mcp   # thêm
+claude mcp add --transport http skill-registry https://<domain>/mcp -s user   # thêm (scope user = global cho mọi project)
 claude mcp remove skill-registry                                      # xoá
 ```
 
@@ -52,6 +52,12 @@ claude mcp remove skill-registry                                      # xoá
 ```bash
 opencode mcp add skill-registry --url https://<domain>/mcp   # thêm
 ```
+OpenCode không có cờ scope như Claude Code (`-s user`/`-s local`) — nó ghi trực tiếp vào
+file config tuỳ nơi bạn đang chạy lệnh: chạy trong 1 project sẽ ghi vào `opencode.json` ở
+root project đó (chỉ project này thấy), chạy ngoài mọi project (vd ở `~`) sẽ ghi vào
+`~/.config/opencode/opencode.json` (global, mọi project thấy). Muốn global thì `cd` ra khỏi
+project trước khi chạy lệnh trên.
+
 OpenCode CLI chưa có lệnh xoá — gỡ thủ công bằng cách mở
 `~/.config/opencode/opencode.json` (global) hoặc `opencode.json` ở root project, xoá entry
 `"skill-registry"` trong mục `mcp`.
